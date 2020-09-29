@@ -5,6 +5,7 @@
 using namespace std;
 
 int framerate=30;
+int startx, starty;
 
 void update_screen(WINDOW* window){
 	wrefresh(window);
@@ -22,7 +23,8 @@ class Button{
 		WINDOW* window;
 		int color;
 		bool selected=false;
-		Button(int a, int b, int c, int d, string txt, WINDOW* win, int color_pair){
+		void(*callback)();
+		Button(int a, int b, int c, int d, string txt, WINDOW* win, int color_pair, void(*callback_f)()){
 			x1=a;
 			x2=b;
 			y1=c;
@@ -30,31 +32,32 @@ class Button{
 			text=txt;
 			window=win;
 			color=color_pair;
+			callback=callback_f;
 		}
 		void draw(){
-			mvhline(y1, x1, 0, x2-x1);
-			mvhline(y2, x1, 0, x2-x1);
-			mvvline(y1, x1, 0, y2-y1);
-			mvvline(y1, x2, 0, y2-y1);
-			mvaddch(y1, x1, ACS_ULCORNER);
-		 	mvaddch(y2, x1, ACS_LLCORNER);
-			mvaddch(y1, x2, ACS_URCORNER);
-		    	mvaddch(y2, x2, ACS_LRCORNER);
+			mvhline(y1+starty, x1+startx, 0, x2-x1);
+			mvhline(y2+starty, x1+startx, 0, x2-x1);
+			mvvline(y1+starty, x1+startx, 0, y2-y1);
+			mvvline(y1+starty, x2+startx, 0, y2-y1);
+			mvaddch(y1+starty, x1+startx, ACS_ULCORNER);
+		 	mvaddch(y2+starty, x1+startx, ACS_LLCORNER);
+			mvaddch(y1+starty, x2+startx, ACS_URCORNER);
+		    	mvaddch(y2+starty, x2+startx, ACS_LRCORNER);
 			if (selected){
 				attron(COLOR_PAIR(color));
 			}
 			for (int x=x1+1;x<x2;x++){
 				for (int y=y1+1;y<y2;y++){
-					mvaddch(y,x,' ');
+					mvaddch(y+starty,x+startx,' ');
 				}
 			}
-			draw_string(x1+((x2-x1)/2),y1+((y2-y1)/2),text,window);
+			draw_string(startx+x1+((x2-x1)/2),starty+y1+((y2-y1)/2),text,window);
 			attroff(COLOR_PAIR(color));
 		}
 };
 
-void add_button(int x, int y, int width, int height, string text, WINDOW* window, int color_pair, vector<Button> &button_list){
-	Button new_button = Button(x-(width/2),x+(width/2),y-(height/2),y+(height/2),text,window,color_pair);
+void add_button(int x, int y, int width, int height, string text, WINDOW* window, int color_pair, vector<Button> &button_list, void(*callback)()){
+	Button new_button = Button(x-(width/2),x+(width/2),y-(height/2),y+(height/2),text,window,color_pair,callback);
 	if (button_list.empty()){
 		new_button.selected=true;
 	}
@@ -75,10 +78,10 @@ WINDOW* new_window(){
 	ioctl( 0, TIOCGWINSZ, (char *) &size );
 	WINDOW* new_win;
 	if (size.ws_row<size.ws_col/2){
-		int startx=(size.ws_col/2)-(size.ws_row);
+		startx=(size.ws_col/2)-(size.ws_row);
 		new_win = newwin(size.ws_row, size.ws_row*2, 0, startx);
 	}else{
-		int starty=(size.ws_row)-(size.ws_col/2);
+		starty=(size.ws_row)-(size.ws_col/2);
 		new_win = newwin(size.ws_col/2, size.ws_col, starty/2, 0);
 	}
 	return new_win;

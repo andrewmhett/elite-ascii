@@ -10,6 +10,15 @@ vector<Button> buttons;
 
 int button_index=0;
 
+void load_saved_game(){}
+
+void create_new_game(){}
+
+void exit_game(){
+	endwin();
+	exit(0);
+}
+
 int main(){
 	initscr();
 	start_color();
@@ -22,14 +31,18 @@ int main(){
 	WINDOW* main_window=new_window();
 	int width=0;
 	int height=0;
+	startx++;
+	starty++;
 	getmaxyx(main_window, height, width);
+	width-=2;
+	height-=2;
 	box(main_window,0,0);
 	attron(A_STANDOUT);
-	draw_string(width/2,height/6," Elite: Ascii ",main_window);
+	draw_string(startx+width/2,starty+height/7," Elite: Ascii ",main_window);
 	attroff(A_STANDOUT);
-	add_button(width/2,height/3,width*0.6,height/8,"Load Saved Game",main_window,2,buttons);
-	add_button(width/2,height/2,width*0.6,height/8,"New Game",main_window,2,buttons);
-	add_button(width/2,2*height/3,width*0.6,height/8,"Exit",main_window,2,buttons);
+	add_button(width/2,height/3,width*0.6,height/8,"Load Saved Game",main_window,2,buttons,load_saved_game);
+	add_button(width/2,height/2,width*0.6,height/8,"New Game",main_window,2,buttons,create_new_game);
+	add_button(width/2,height-height/3,width*0.6,height/8,"Exit",main_window,2,buttons,exit_game);
 	update_screen(main_window);
 	while (1){
 		switch(getch()){
@@ -58,6 +71,10 @@ int main(){
 				break;
 			//left arrow
 			case 68:
+				break;
+			//enter
+			case 10:
+				buttons[button_index].callback();
 				break;
 		}
 	}
