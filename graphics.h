@@ -23,8 +23,9 @@ class Button{
 		WINDOW* window;
 		int color;
 		bool selected=false;
+		bool text_entry=false;
 		void(*callback)();
-		Button(int a, int b, int c, int d, string txt, WINDOW* win, int color_pair, void(*callback_f)()){
+		Button(int a, int b, int c, int d, string txt, WINDOW* win, int color_pair, void(*callback_f)(), bool text_en){
 			x1=a;
 			x2=b;
 			y1=c;
@@ -33,6 +34,7 @@ class Button{
 			window=win;
 			color=color_pair;
 			callback=callback_f;
+			text_entry=text_en;
 		}
 		void draw(){
 			mvhline(y1+starty, x1+startx, 0, x2-x1);
@@ -56,8 +58,8 @@ class Button{
 		}
 };
 
-void add_button(int x, int y, int width, int height, string text, WINDOW* window, int color_pair, vector<Button> &button_list, void(*callback)()){
-	Button new_button = Button(x-(width/2),x+(width/2),y-(height/2),y+(height/2),text,window,color_pair,callback);
+void add_button(int x, int y, int width, int height, string text, WINDOW* window, int color_pair, vector<Button> &button_list, void(*callback)(), bool text_en=false){
+	Button new_button = Button(x-(width/2),x+(width/2),y-(height/2),y+(height/2),text,window,color_pair,callback,text_en);
 	if (button_list.empty()){
 		new_button.selected=true;
 	}
