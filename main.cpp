@@ -12,6 +12,9 @@ WINDOW* main_window;
 int button_index=0;
 int width;
 int height;
+jsonf game_json;
+
+void load_main_menu();
 
 void clear_screen(){
 	button_index=0;
@@ -22,12 +25,49 @@ void clear_screen(){
 	update_screen(main_window);
 }
 
+void start_game(string name){
+	game_json=LoadSave(name);
+	clear_screen();
+}
+
+void load_game(){
+	if (buttons[0].text.length()>0){
+		try{
+			start_game(buttons[0].text);
+		}catch (int err){
+			attron(COLOR_PAIR(2));
+			draw_string(startx+width/2,starty+(height/2)-(height/10),"Invalid save name",main_window);
+			attroff(COLOR_PAIR(2));
+			buttons[button_index].text="";
+		}
+	}
+}
+
 void load_save_game_menu(){
-	
+	clear_screen();
+	attron(A_STANDOUT);
+	draw_string(startx+width/2,starty+height/7," Load a Saved Game ",main_window);
+	attroff(A_STANDOUT);
+	add_button(width/2,(height/2)-(height/10),width*0.6,height/8,"",main_window,2,buttons,load_game,true);
+	add_button(width/2,(height/2)+(height/10),width*0.6,height/8,"Back",main_window,2,buttons,load_main_menu);
+	attron(COLOR_PAIR(2));
+	draw_string(startx+width/2,starty+(height/2)-(height/10),"Saved game name",main_window);
+	attroff(COLOR_PAIR(2));
+	update_screen(main_window);
 }
 
 void start_new_game(){
-	NewSave(buttons[0].text);
+	if (buttons[0].text.length()>0){
+		try{
+			NewSave(buttons[0].text);
+			start_game(buttons[0].text);
+		}catch (int err){
+			attron(COLOR_PAIR(2));
+			draw_string(startx+width/2,starty+(height/2)-(height/10),"Save name already exists",main_window);
+			attroff(COLOR_PAIR(2));
+			buttons[button_index].text="";
+		}
+	}
 }
 
 void exit_game(){
@@ -35,10 +75,11 @@ void exit_game(){
 	exit(0);
 }
 
-void load_main_menu();
-
 void create_new_game(){
 	clear_screen();
+	attron(A_STANDOUT);
+	draw_string(startx+width/2,starty+height/7," Create a New Game ",main_window);
+	attroff(A_STANDOUT);
 	add_button(width/2,(height/2)-(height/10),width*0.6,height/8,"",main_window,2,buttons,start_new_game,true);
 	add_button(width/2,(height/2)+(height/10),width*0.6,height/8,"Back",main_window,2,buttons,load_main_menu);
 	attron(COLOR_PAIR(2));
